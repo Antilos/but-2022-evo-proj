@@ -1,0 +1,190 @@
+%%%%%%%%                        01 - Motivace                       %%%%%%%%
+%---------------------------------------------------------------------------
+% Při prezentování nejvíc záleží na začátku. 
+% Pro získání pozornosti na začátku veřejné řeči se doporučuje: říct nějakou statistiku; položit otázku (u státnic spíše řečnickou).
+
+% HEROUT, Adam. Prezentování. Herout.net: Poznámky učitele, kouče, čtenáře. [online]. [cit. 2021-9-15]. Dostupné z: https://www.herout.net/blog/category/prezentovani/
+%---------------------------------------------------------------------------
+
+% - Uveďte posluchače do tématu své práce.
+% - Řekněte něco málo o stavu před zahájením práce a jaké byly důvody pro její vypracování.
+% - Nejlepší je vysvětlit motivaci pomocí schématu. Pokud musíte použít odrážky, tak super-stručné, abyste je nečetli, ale ony pouze tvořily kostru sdělení.
+
+% Z této části prezentace musí posluchači dostat stručné a výstižné odpovědi na otázky:
+%  A) Proč děláte, co děláte? K čemu je to dobré?
+%  B) Co je cílem práce? Co má být výsledkem?
+
+% Odolejte pokušení říkat banality a všeobecně známé informace.
+% "Žijeme v době rozvoje mobilní výpočetní techniky, kdy každý má v kapse mobil" - je dokonale prázdné a hloupé sdělení, nic takového neříkejte, fakt to nikoho nezajímá.
+
+%\usepackage{graphicx}
+%\graphicspath{ {./img/} }
+
+\begin{frame}
+  \frametitle{Zadanie}
+  Problémem barvení grafu (Graph Coloring Problem) je problém jak obarvit množinu vrcholů spojených hranami co nejmenším počtem barev tak, aby žádné dva sousední vrcholy neměly stejnou barvu. Tento problém je NP-úplný (neexistuje způsob jak efektivně najít jeho optimální řešení) a je proto úlohou vhodnou pro optimalizaci pomocí evolučních algoritmů.
+  
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Implementácia}
+	
+	\begin{enumerate}
+		\item Genetický algoritmus bol implementovaný pomocou knižnice \emph{PyGad}.
+		\item Graf bol implemntovaný v jazyku Python, s využitím matice susednosti
+		\item 
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Fitness}
+	\begin{itemize}
+		\item Dve fitness funkcie
+		\begin{enumerate}
+			\item $Fit = 1 - |\{v | v \in V, v \text{ is in conflict}\}| / |V|$
+			\begin{itemize}
+				\item Použitá s obmedzeným počtom farieb (napríklad ak poznáme chromatické číslo grafu)
+			\end{itemize}
+		
+			\item \begin{equation*}
+				Fit = 
+				\begin{cases}
+					1 - |\{v | v \in V, v \text{ is in conflict}\}| / |V| & numConflicts = 0	\\
+					1 + numVertices - numColors  & otherwise	
+				\end{cases}
+			\end{equation*}
+			\begin{itemize}
+				\item Použitá v optimalizačnom móde, s počtom farieb obmedzeným počtom vrcholov
+				\item Po nájdení riešenia 
+			\end{itemize}
+		\end{enumerate}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Mutácia}
+	\begin{itemize}
+		\item Mutovať môžme priamo genotyp.
+		\item Farby nemá zmysel meniť inkrementálne; nie je na nich definované žiadne zoradenie
+		\item Nemá zmysel meniť vrcholy/hrany ktoré nie sú v konflikte (mutácia pomocou fenotypu).
+	\end{itemize}
+	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Kríženie}
+	\begin{itemize}
+		\item Gény nemajú žiadnu lokálnu závislosť: nemôžme krížiť iba genotyp (napr. Single-Point)
+		\item Musíme využiť vzťahy vo fenotype:
+		\begin{itemize}
+			\item Všetky vrcholy/hrany z jedného rodiča vymeníme za príslušné vrcholy/hrany z druhého rodiča
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Experiment - Bez optimalizácie}
+	\begin{itemize}
+		\item Obmedzený počet farieb (5)
+		\item Žiadna optimalizácia počtu farieb
+	\end{itemize}
+\begin{table}
+	\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|}
+			\hline
+			& Mean Fitness & Mean Conflict Ratio [\%] & Solutions Found [\%] & Mean Best Generation \\
+			\hline
+			Naive & 0.24 & 70.62 & 0\% & 12.99 \\
+			\hline
+			Custom & 0.98 & 1.84 & 34\% & 8.17 \\
+			\hline
+	\end{tabular}}
+	\caption{Agregované výsledky 100 behov na grafe \emph{1-FullIns4}\footnote{Link to Graph}}
+\end{table}
+
+\begin{figure}
+	\begin{subfigure}{.5\textwidth}
+		\includegraphics[scale=0.32]{no-optim-summary.png}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\includegraphics[scale=0.32]{no-optim-fit-dev.png}
+	\end{subfigure}
+	
+\end{figure}
+	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Experiment - Optimalizačný Mód}
+	\begin{itemize}
+		\item Počet farieb obmedzený počtom vrcholov
+		\item Fitness funkcia optimalizuje počet farieb po nájdení riešenia
+	\end{itemize}
+	\begin{table}
+		\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|}
+			\hline
+			& Mean Fitness & Mean Conflict Ratio &  Solutions Found [\%] & Mean Best Generation \\
+			\hline
+			Naive & 6.54 & 2.23 & 0.17 & 10.52 \\
+			\hline
+			Custom & 38.15 & 0.00 & 1.00 & 0.99 \\
+			\hline
+		\end{tabular}}
+		\caption{Agregované výsledky 100 behov na grafe \emph{1-FullIns4}\footnote{Link to Graph}}
+	\end{table}
+
+	\begin{figure}
+		\begin{subfigure}{.5\textwidth}
+			\includegraphics[scale=0.32]{optim-summary.png}
+		\end{subfigure}%
+		\begin{subfigure}{.5\textwidth}
+			\includegraphics[scale=0.32]{optim-fit-dev.png}
+		\end{subfigure}
+		
+	\end{figure}
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{Experiment - Farbenie Hrán}
+	\begin{itemize}
+		\item Počet farieb obmedzený počtom vrcholov
+		\item Fitness funkcia optimalizuje počet farieb po nájdení riešenia
+	\end{itemize}
+	\begin{table}
+		\resizebox{\textwidth}{!}{\begin{tabular}{|c|c|c|c|c|}
+				\hline
+				& Mean Fitness & Mean Conflict Ratio &  Solutions Found [\%] & Mean Best Generation \\
+				\hline
+				Naive & 6.75 & 1.95 & 0.0 & 10.13 \\
+				\hline
+				Custom & 40.15 & 0.00 & 1 & 0.99 \\
+				\hline
+		\end{tabular}}
+		\caption{Agregované výsledky 100 behov na grafe \emph{1-FullIns3}\footnote{Link to Graph}}
+	\end{table}
+	
+	\begin{figure}
+		\begin{subfigure}{.5\textwidth}
+			\includegraphics[scale=0.32]{edge-optim-summary.png}
+		\end{subfigure}%
+		\begin{subfigure}{.5\textwidth}
+			\includegraphics[scale=0.32]{edge-optim-fit-dev.png}
+		\end{subfigure}
+		
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Záver}
+	\begin{itemize}
+		\item Výsledky dokazujú že genetický algoritmus je schopný ofarbovať grafy. Evolučné riešenie nachádza riešenia v rádovo nižšom čase ako tradičné metódy, ale riešenia nie sú optimálne.
+		\item Algoritmus rýchlo saturuje, nevykazuje schopnosť prekročiť lokálne minimá.
+		\item Čo nebolo skúmané:
+		\begin{itemize}
+			\item Vpliv výberu rodičov
+		\end{itemize}
+	\end{itemize}
+	
+\end{frame}
+

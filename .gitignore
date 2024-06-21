@@ -1,0 +1,9 @@
+*.csv
+*.zip
+*.tar
+*.gz
+*.png
+/experiments*
+/__pycache__
+/graphs
+fit*
